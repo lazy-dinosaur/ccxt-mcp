@@ -1,6 +1,6 @@
 {
   "name": "@lazydino/ccxt-mcp",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "CCXT integration for Model Context Protocol",
   "type": "module",
   "main": "dist/index.js",
