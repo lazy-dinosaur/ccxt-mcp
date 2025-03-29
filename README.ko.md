@@ -9,10 +9,6 @@
 
 CCXT MCP 서버는 [Model Context Protocol (MCP)](https://github.com/anthropics/anthropic-cookbook/tree/main/model-context-protocol)을 통해 AI 모델이 암호화폐 거래소 API와 상호작용할 수 있도록 하는 서버입니다. 이 서버는 [CCXT 라이브러리](https://github.com/ccxt/ccxt)를 사용하여 100개 이상의 암호화폐 거래소에 접근하고 거래할 수 있는 기능을 제공합니다.
 
-<p align="center">
-  <img src="https://github.com/lazy-dinosaur/ccxt-mcp/assets/35533379/a4eaa4a7-0845-4a2d-b80f-842b46881ab7" alt="CCXT MCP 다이어그램" width="600">
-</p>
-
 ## 🚀 빠른 시작
 
 ```bash
@@ -226,6 +222,7 @@ ccxt 툴을 최대한 이용해서 매매를 실행하는게 너의 목표야
 ```
 
 **참고 사항:**
+
 - AI 모델은 종종 선물 매매와 현물 매매를 혼동할 수 있습니다.
 - 거래 자본 규모에 대한 명확한 지침 없이는 AI가 혼란을 겪을 수 있습니다.
 - 위의 프롬프트를 사용하면 거래 의도를 명확히 전달하는 데 도움이 됩니다.
@@ -249,121 +246,6 @@ ccxt 툴을 최대한 이용해서 매매를 실행하는게 너의 목표야
 
 ```
 지난 7일간의 내 Binance 계정(bybit_main) 거래 기록을 분석해서 승률, 평균 수익률, 최대 연속 손실을 보여줘.
-```
-
-## 고급 사용법 예시
-
-다음은 CCXT MCP를 활용한 고급 트레이딩 기능 구현 예시입니다:
-
-### 포지션 자본 비율 및 레버리지 설정
-
-```javascript
-// 계정 자본의 5%로 10배 레버리지 롱 포지션 진입
-async function enterPositionWithCapitalRatio(
-  client,
-  accountName,
-  symbol,
-  capitalPercentage,
-  leverage,
-) {
-  // 계정 잔액 조회
-  const balance = await client.callTool({
-    name: "fetchBalance",
-    arguments: { accountName },
-  });
-
-  // 사용 가능한 USDT 가져오기
-  const availableCapital = balance.free.USDT || 0;
-
-  // 진입 금액 계산 (자본의 5%)
-  const entryCapital = availableCapital * (capitalPercentage / 100);
-
-  // 현재 시장 가격 가져오기
-  const ticker = await client.callTool({
-    name: "fetchTicker",
-    arguments: { exchangeId: "bybit", symbol },
-  });
-
-  // 거래량 계산
-  const entryPrice = ticker.last;
-  const amount = entryCapital / entryPrice;
-
-  // 레버리지 설정 (거래소별 구현 필요)
-  await setupLeverage(client, accountName, symbol, leverage);
-
-  // 주문 생성 (선물 시장)
-  return client.callTool({
-    name: "createOrder",
-    arguments: {
-      accountName,
-      symbol,
-      type: "market",
-      side: "buy",
-      amount,
-      params: {
-        leverage: leverage,
-        marginMode: "cross",
-      },
-    },
-  });
-}
-```
-
-### 캔들 기반 손절 설정
-
-```javascript
-// N개 캔들 중 저점 기준 손절 설정
-async function setStopLossBasedOnCandles(
-  client,
-  accountName,
-  symbol,
-  timeframe,
-  candles,
-) {
-  // 최근 캔들 데이터 가져오기
-  const ohlcv = await client.callTool({
-    name: "fetchOHLCV",
-    arguments: {
-      exchangeId: accountName.split("-")[0],
-      symbol,
-      timeframe,
-      limit: candles,
-    },
-  });
-
-  // 저점 찾기
-  const lows = ohlcv.map((candle) => candle[3]); // 저가 (Low)
-  const lowestPrice = Math.min(...lows);
-
-  // 오픈 포지션 찾기
-  const positions = await client.callTool({
-    name: "fetchPositions",
-    arguments: { accountName, symbol },
-  });
-
-  if (positions.length === 0) {
-    throw new Error("No open positions found");
-  }
-
-  const position = positions[0];
-
-  // 손절 주문 생성
-  return client.callTool({
-    name: "createOrder",
-    arguments: {
-      accountName,
-      symbol,
-      type: "stop",
-      side: position.side === "long" ? "sell" : "buy",
-      amount: position.amount,
-      price: lowestPrice * 0.995, // 약간의 슬리피지 추가
-      params: {
-        stopPrice: lowestPrice,
-        reduceOnly: true,
-      },
-    },
-  });
-}
 ```
 
 ## 개발

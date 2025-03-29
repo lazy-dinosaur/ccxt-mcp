@@ -9,10 +9,6 @@
 
 CCXT MCP Server is a server that allows AI models to interact with cryptocurrency exchange APIs through the [Model Context Protocol (MCP)](https://github.com/anthropics/anthropic-cookbook/tree/main/model-context-protocol). This server uses the [CCXT library](https://github.com/ccxt/ccxt) to provide access to more than 100 cryptocurrency exchanges and their trading capabilities.
 
-<p align="center">
-  <img src="https://github.com/lazy-dinosaur/ccxt-mcp/assets/35533379/a4eaa4a7-0845-4a2d-b80f-842b46881ab7" alt="CCXT MCP Diagram" width="600">
-</p>
-
 ## 🚀 Quick Start
 
 ```bash
@@ -226,6 +222,7 @@ Cautions:
 ```
 
 **Notes:**
+
 - AI models sometimes confuse futures trading with spot trading.
 - Without clear guidance on trading capital size, AI might get confused.
 - Using the above prompt helps clearly communicate your trading intentions.
@@ -249,121 +246,6 @@ Enter based on moving average crossover strategy and set stop loss at the lowest
 
 ```
 Analyze my Binance account (bybit_main) trading records for the last 7 days and show me the win rate, average profit, and maximum consecutive losses.
-```
-
-## Advanced Usage Examples
-
-Here are examples of advanced trading features implemented using CCXT MCP:
-
-### Position Capital Ratio and Leverage Setting
-
-```javascript
-// Enter a long position with 5% of account capital and 10x leverage
-async function enterPositionWithCapitalRatio(
-  client,
-  accountName,
-  symbol,
-  capitalPercentage,
-  leverage,
-) {
-  // Check account balance
-  const balance = await client.callTool({
-    name: "fetchBalance",
-    arguments: { accountName },
-  });
-
-  // Get available USDT
-  const availableCapital = balance.free.USDT || 0;
-
-  // Calculate entry amount (5% of capital)
-  const entryCapital = availableCapital * (capitalPercentage / 100);
-
-  // Get current market price
-  const ticker = await client.callTool({
-    name: "fetchTicker",
-    arguments: { exchangeId: "bybit", symbol },
-  });
-
-  // Calculate volume
-  const entryPrice = ticker.last;
-  const amount = entryCapital / entryPrice;
-
-  // Set leverage (needs exchange-specific implementation)
-  await setupLeverage(client, accountName, symbol, leverage);
-
-  // Create order (futures market)
-  return client.callTool({
-    name: "createOrder",
-    arguments: {
-      accountName,
-      symbol,
-      type: "market",
-      side: "buy",
-      amount,
-      params: {
-        leverage: leverage,
-        marginMode: "cross",
-      },
-    },
-  });
-}
-```
-
-### Candle-Based Stop Loss Setting
-
-```javascript
-// Set stop loss based on the lowest point among N candles
-async function setStopLossBasedOnCandles(
-  client,
-  accountName,
-  symbol,
-  timeframe,
-  candles,
-) {
-  // Get recent candle data
-  const ohlcv = await client.callTool({
-    name: "fetchOHLCV",
-    arguments: {
-      exchangeId: accountName.split("-")[0],
-      symbol,
-      timeframe,
-      limit: candles,
-    },
-  });
-
-  // Find the lowest point
-  const lows = ohlcv.map((candle) => candle[3]); // Low price
-  const lowestPrice = Math.min(...lows);
-
-  // Find open positions
-  const positions = await client.callTool({
-    name: "fetchPositions",
-    arguments: { accountName, symbol },
-  });
-
-  if (positions.length === 0) {
-    throw new Error("No open positions found");
-  }
-
-  const position = positions[0];
-
-  // Create stop loss order
-  return client.callTool({
-    name: "createOrder",
-    arguments: {
-      accountName,
-      symbol,
-      type: "stop",
-      side: position.side === "long" ? "sell" : "buy",
-      amount: position.amount,
-      price: lowestPrice * 0.995, // Add a small slippage
-      params: {
-        stopPrice: lowestPrice,
-        reduceOnly: true,
-      },
-    },
-  });
-}
 ```
 
 ## Development
