@@ -60,7 +60,7 @@ npx @lazydino/ccxt-mcp --help
   "mcpServers": {
     "ccxt-mcp": {
       "command": "npx",
-      "args": ["@lazydino/ccxt-mcp"],
+      "args": ["-y", "@lazydino/ccxt-mcp"],
       "accounts": [
         {
           "name": "bybit_main",
@@ -118,7 +118,12 @@ npx @lazydino/ccxt-mcp --help
   "mcpServers": {
     "ccxt-mcp": {
       "command": "npx",
-      "args": ["@lazydino/ccxt-mcp", "--config", "/path/to/ccxt-accounts.json"]
+      "args": [
+        "-y",
+        "@lazydino/ccxt-mcp",
+        "--config",
+        "/path/to/ccxt-accounts.json"
+      ]
     }
   }
 }
