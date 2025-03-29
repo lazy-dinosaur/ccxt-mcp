@@ -1,0 +1,17 @@
+ccxt
+mcp
+modelcontextprotocol
+cryptocurrency
+trading
+exchange
+api
+claude
+gpt
+ai-trading
+crypto-trading
+crypto-exchange
+crypto-api
+ai-tools
+trading-bot
+algorithmic-trading
+quantitative-trading
