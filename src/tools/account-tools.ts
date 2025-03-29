@@ -13,6 +13,23 @@ export function registerAccountTools(
   server: McpServer,
   ccxtServer: CcxtMcpServer
 ) {
+  // 계정 목록 조회 도구
+  server.tool(
+    "listAccounts",
+    "List all configured account names",
+    {},
+    async () => {
+      const accountNames = ccxtServer.getAccountNames();
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Configured accounts (${accountNames.length}):\n${accountNames.join("\n")}`,
+          },
+        ],
+      };
+    }
+  );
   // 계정 잔액 조회 도구
   server.tool(
     "fetchBalance",

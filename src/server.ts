@@ -29,7 +29,19 @@ interface AccountConfig {
   exchangeId: string;
   apiKey: string;
   secret: string;
-  defaultType?: "spot" | "futures"; // Optional, default can be handled
+  password?: string; // Some exchanges require password (e.g. FTX)
+  uid?: string; // Some exchanges require UID (e.g. Deribit)
+  privateKey?: string; // For exchanges using private key auth
+  walletAddress?: string; // For DEX exchanges
+  subaccount?: string; // For exchanges with subaccount support
+  defaultType?: "spot" | "margin" | "future" | "swap" | "option"; // Extended market types
+  enableRateLimit?: boolean; // Rate limiter control
+  timeout?: number; // Custom timeout
+  verbose?: boolean; // Debug mode
+  proxy?: string; // Proxy settings
+  options?: {
+    [key: string]: any; // Exchange-specific options
+  };
 }
 
 /**
@@ -61,7 +73,7 @@ export class CcxtMcpServer {
   /**
    * 설정 파일에서 계정 정보를 로드하고 CCXT 인스턴스를 생성합니다.
    */
-  private loadAccountsFromConfig() {
+  private async loadAccountsFromConfig() {
     const configPath = path.join(
       os.homedir(),
       ".config",
@@ -136,6 +148,29 @@ export class CcxtMcpServer {
             exchangeOptions,
           );
 
+          // 특정 마켓 타입이 지원되는지 검증
+          if (account.defaultType) {
+            await exchangeInstance.loadMarkets();
+            const supportedTypes = {
+              spot: exchangeInstance.has.spot,
+              margin: exchangeInstance.has.margin,
+              future: exchangeInstance.has.futures,
+              swap: exchangeInstance.has.swap,
+              option: exchangeInstance.has.option
+            };
+            
+            if (!supportedTypes[account.defaultType]) {
+              console.error(
+                `${account.exchangeId} does not support ${account.defaultType} trading. ` +
+                `Supported types: ${Object.entries(supportedTypes)
+                  .filter(([_, supported]) => supported)
+                  .map(([type]) => type)
+                  .join(', ')}`
+              );
+              continue;
+            }
+          }
+
           // Store the instance using the account name as the key
           this.exchangeInstances[account.name] = exchangeInstance;
         } catch (error) {
@@ -153,6 +188,59 @@ export class CcxtMcpServer {
       // Consider if the server should fail to start if config is essential
     }
   } // loadAccountsFromConfig 메소드 닫는 괄호
+
+  /**
+   * 선물 주문을 위한 거래소별 파라미터 반환
+   */
+  private getFutureParams(exchangeId: string) {
+    return (
+      {
+        binance: { type: "future", marginMode: "cross" },
+        bybit: { category: "linear" },
+        okx: { instType: "SWAP" },
+        kucoin: { type: "future" },
+      }[exchangeId.toLowerCase()] || {}
+    );
+  }
+
+  /**
+   * 선물 주문 실행 (자동 재시도 포함)
+   */
+  async executeFutureOrder(
+    accountName: string,
+    orderParams: {
+      symbol: string;
+      type: string;
+      side: string;
+      amount: number;
+      price?: number;
+      params?: any;
+    },
+  ) {
+    const exchange = this.getExchangeInstance(accountName);
+    const futureParams = this.getFutureParams(exchange.id);
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        return await exchange.createOrder(
+          orderParams.symbol,
+          orderParams.type,
+          orderParams.side,
+          orderParams.amount,
+          orderParams.price,
+          {
+            ...(orderParams.params || {}),
+            ...futureParams,
+          },
+        );
+      } catch (error) {
+        if (attempt === 2) throw error;
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1000 * (attempt + 1)),
+        );
+      }
+    }
+  }
 
   /**
    * 설정 파일에서 미리 로드된 특정 계정 이름에 해당하는 인증된 거래소 인스턴스를 가져옵니다.
@@ -181,6 +269,14 @@ export class CcxtMcpServer {
    * @returns 요청된 거래소/시장 유형에 대한 공개 CCXT 인스턴스
    * @throws 지원되지 않는 거래소 ID인 경우 오류 발생
    */
+  /**
+   * 로드된 모든 계정 이름 목록을 반환합니다.
+   */
+  getAccountNames(): string[] {
+    return Object.keys(this.exchangeInstances);
+  }
+
+
   getPublicExchangeInstance(
     exchangeId: string,
     marketType: "spot" | "futures" = "spot",
