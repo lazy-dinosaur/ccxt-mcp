@@ -49,9 +49,46 @@ npx @lazydino/ccxt-mcp --help
    - 설정 저장
    - "Test Connection" 버튼으로 연결 테스트
 
-### 설정 파일
+### 설정 방법 - 두 가지 옵션
 
-설정 파일은 다음과 같은 형식으로 구성됩니다:
+#### 옵션 1: Claude Desktop 설정 파일 내에 직접 계정 정보 포함 (기본 방식)
+
+이 방식은 Claude Desktop 설정 파일(claude_desktop_config.json) 내에 직접 CCXT 계정 정보를 포함합니다:
+
+```json
+{
+  "mcpServers": {
+    "ccxt-mcp": {
+      "command": "npx",
+      "args": ["@lazydino/ccxt-mcp"],
+      "accounts": [
+        {
+          "name": "bybit_main",
+          "exchangeId": "bybit",
+          "apiKey": "YOUR_API_KEY",
+          "secret": "YOUR_SECRET_KEY",
+          "defaultType": "spot"
+        },
+        {
+          "name": "bybit_futures",
+          "exchangeId": "bybit",
+          "apiKey": "YOUR_API_KEY",
+          "secret": "YOUR_SECRET_KEY",
+          "defaultType": "swap"
+        }
+      ]
+    }
+  }
+}
+```
+
+이 방식을 사용하면 별도의 설정 파일이 필요하지 않습니다. 모든 설정이 Claude Desktop 구성 파일에 통합됩니다.
+
+#### 옵션 2: 별도 설정 파일 사용 (고급 방식)
+
+계정 정보를 별도의 설정 파일로 분리하려면 다음과 같이 구성하세요:
+
+1. **별도 설정 파일 생성** (예: `ccxt-accounts.json`):
 
 ```json
 {
@@ -74,14 +111,25 @@ npx @lazydino/ccxt-mcp --help
 }
 ```
 
-> **참고**: 별도의 설정 파일을 사용하면 Claude Desktop 구성 파일과의 재귀 참조 문제를 방지할 수 있습니다. Claude Desktop의 설정에 다음과 같이 MCP 서버를 등록하세요:
+2. **Claude Desktop 설정에서 설정 파일 경로 지정**:
+
+```json
+{
+  "mcpServers": {
+    "ccxt-mcp": {
+      "command": "npx",
+      "args": ["@lazydino/ccxt-mcp", "--config", "/path/to/ccxt-accounts.json"]
+    }
+  }
+}
+```
+
+> **별도 설정 파일을 사용하는 이유**:
 >
-> ```json
-> "ccxt-mcp": {
->   "command": "npx",
->   "args": ["-y","@lazydino/ccxt-mcp", "--config", "/path/to/config.json"]
-> }
-> ```
+> - 재귀 참조 문제 방지
+> - API 키와 같은 민감한 정보 분리
+> - 다중 환경 설정 용이(개발, 테스트, 프로덕션)
+> - 설정 파일 버전 관리 개선
 
 ## 주요 기능
 
