@@ -266,10 +266,6 @@ npm install
 npm run build
 ```
 
-## 📚 Documentation
-
-For detailed documentation, see the [Wiki](https://github.com/lazy-dinosaur/ccxt-mcp/wiki).
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
