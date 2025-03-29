@@ -54,8 +54,9 @@ export function registerExchangeResources(server: McpServer, ccxtServer: CcxtMcp
     async (uri, variables) => {
       const { exchangeId } = variables;
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId as string);
-        
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId as string);
+
         // 거래소 기본 정보
         const info = {
           id: exchange.id,

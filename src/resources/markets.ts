@@ -44,7 +44,8 @@ export function registerMarketResources(
     async (uri, variables) => {
       const { exchangeId } = variables;
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId as string);
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId as string);
         const markets = await exchange.loadMarkets();
 
         return {
@@ -91,7 +92,8 @@ export function registerMarketResources(
           if (!exchangeId) return [];
 
           try {
-            const exchange = ccxtServer.getExchangeInstance(
+            // 공개 인스턴스 사용 (자동완성용)
+            const exchange = ccxtServer.getPublicExchangeInstance(
               exchangeId as string
             );
             await exchange.loadMarkets();
@@ -112,7 +114,8 @@ export function registerMarketResources(
       const { exchangeId, symbol } = variables;
 
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId as string);
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId as string);
         await exchange.loadMarkets();
         const market = exchange.market(symbol as string);
 

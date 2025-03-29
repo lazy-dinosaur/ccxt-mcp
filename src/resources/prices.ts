@@ -37,7 +37,8 @@ export function registerPriceResources(
           if (!exchangeId) return [];
 
           try {
-            const exchange = ccxtServer.getExchangeInstance(
+            // 공개 인스턴스 사용 (자동완성용)
+            const exchange = ccxtServer.getPublicExchangeInstance(
               exchangeId as string
             );
             await exchange.loadMarkets();
@@ -58,7 +59,8 @@ export function registerPriceResources(
       const { exchangeId, symbol } = variables;
 
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId as string);
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId as string);
         const ticker = await exchange.fetchTicker(symbol as string);
 
         return {
@@ -103,7 +105,8 @@ export function registerPriceResources(
       const { exchangeId } = variables;
 
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId as string);
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId as string);
         const tickers = await exchange.fetchTickers();
 
         return {

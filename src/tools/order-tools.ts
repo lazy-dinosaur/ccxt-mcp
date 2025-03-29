@@ -16,14 +16,13 @@ export function registerOrderTools(
   // 주문 생성 도구
   server.tool(
     "createOrder",
-    "Create a new order on an exchange (requires API credentials)",
+    "Create a new order using a configured account",
     {
-      exchangeId: z
+      accountName: z
         .string()
-        .describe("Exchange ID (e.g., 'binance', 'coinbase')"),
-      marketType: z
-        .enum(["spot", "futures"])
-        .describe("Market type: 'spot' or 'futures'"),
+        .describe(
+          "Account name defined in the configuration file (e.g., 'bybit_main')"
+        ),
       symbol: z.string().describe("Trading symbol (e.g., 'BTC/USDT')"),
       type: z
         .enum(["market", "limit"])
@@ -40,8 +39,7 @@ export function registerOrderTools(
         .describe("Additional exchange-specific parameters"),
     },
     async ({
-      exchangeId,
-      marketType,
+      accountName,
       symbol,
       type,
       side,
@@ -50,20 +48,9 @@ export function registerOrderTools(
       params,
     }) => {
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId, marketType);
+        const exchange = ccxtServer.getExchangeInstance(accountName);
 
-        // API 키가 설정되어 있는지 확인
-        if (!exchange.apiKey || !exchange.secret) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: "API credentials not set. Please use setExchangeCredentials tool first.",
-              },
-            ],
-            isError: true,
-          };
-        }
+        // getExchangeInstance가 성공하면 인증은 보장됨
 
         // 주문 유형이 limit인데 가격이 없는 경우
         if (type === "limit" && price === undefined) {
@@ -100,7 +87,9 @@ export function registerOrderTools(
           content: [
             {
               type: "text",
-              text: `Error creating order: ${(error as Error).message}`,
+              text: `Error creating order for account '${accountName}': ${
+                (error as Error).message
+              }`,
             },
           ],
           isError: true,
@@ -112,14 +101,13 @@ export function registerOrderTools(
   // 주문 취소 도구
   server.tool(
     "cancelOrder",
-    "Cancel an existing order on an exchange (requires API credentials)",
+    "Cancel an existing order using a configured account",
     {
-      exchangeId: z
+      accountName: z
         .string()
-        .describe("Exchange ID (e.g., 'binance', 'coinbase')"),
-      marketType: z
-        .enum(["spot", "futures"])
-        .describe("Market type: 'spot' or 'futures'"),
+        .describe(
+          "Account name defined in the configuration file (e.g., 'bybit_main')"
+        ),
       id: z.string().describe("Order ID to cancel"),
       symbol: z.string().describe("Trading symbol (e.g., 'BTC/USDT')"),
       params: z
@@ -127,22 +115,11 @@ export function registerOrderTools(
         .optional()
         .describe("Additional exchange-specific parameters"),
     },
-    async ({ exchangeId, marketType, id, symbol, params }) => {
+    async ({ accountName, id, symbol, params }) => {
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId, marketType);
+        const exchange = ccxtServer.getExchangeInstance(accountName);
 
-        // API 키가 설정되어 있는지 확인
-        if (!exchange.apiKey || !exchange.secret) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: "API credentials not set. Please use setExchangeCredentials tool first.",
-              },
-            ],
-            isError: true,
-          };
-        }
+        // getExchangeInstance가 성공하면 인증은 보장됨
 
         const result = await exchange.cancelOrder(id, symbol, params);
 
@@ -159,7 +136,9 @@ export function registerOrderTools(
           content: [
             {
               type: "text",
-              text: `Error canceling order: ${(error as Error).message}`,
+              text: `Error canceling order for account '${accountName}': ${
+                (error as Error).message
+              }`,
             },
           ],
           isError: true,
@@ -171,14 +150,13 @@ export function registerOrderTools(
   // 주문 조회 도구
   server.tool(
     "fetchOrder",
-    "Fetch information about a specific order (requires API credentials)",
+    "Fetch information about a specific order using a configured account",
     {
-      exchangeId: z
+      accountName: z
         .string()
-        .describe("Exchange ID (e.g., 'binance', 'coinbase')"),
-      marketType: z
-        .enum(["spot", "futures"])
-        .describe("Market type: 'spot' or 'futures'"),
+        .describe(
+          "Account name defined in the configuration file (e.g., 'bybit_main')"
+        ),
       id: z.string().describe("Order ID to fetch"),
       symbol: z.string().describe("Trading symbol (e.g., 'BTC/USDT')"),
       params: z
@@ -186,22 +164,11 @@ export function registerOrderTools(
         .optional()
         .describe("Additional exchange-specific parameters"),
     },
-    async ({ exchangeId, marketType, id, symbol, params }) => {
+    async ({ accountName, id, symbol, params }) => {
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId, marketType);
+        const exchange = ccxtServer.getExchangeInstance(accountName);
 
-        // API 키가 설정되어 있는지 확인
-        if (!exchange.apiKey || !exchange.secret) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: "API credentials not set. Please use setExchangeCredentials tool first.",
-              },
-            ],
-            isError: true,
-          };
-        }
+        // getExchangeInstance가 성공하면 인증은 보장됨
 
         // fetchOrder 메서드가 지원되는지 확인
         if (!exchange.has["fetchOrder"]) {
@@ -209,7 +176,7 @@ export function registerOrderTools(
             content: [
               {
                 type: "text",
-                text: `Exchange ${exchangeId} does not support fetching order details`,
+                text: `Account '${accountName}' (Exchange: ${exchange.id}) does not support fetching order details`,
               },
             ],
             isError: true,
@@ -231,7 +198,9 @@ export function registerOrderTools(
           content: [
             {
               type: "text",
-              text: `Error fetching order: ${(error as Error).message}`,
+              text: `Error fetching order for account '${accountName}': ${
+                (error as Error).message
+              }`,
             },
           ],
           isError: true,
@@ -243,14 +212,13 @@ export function registerOrderTools(
   // 열린 주문 조회 도구
   server.tool(
     "fetchOpenOrders",
-    "Fetch all open orders (requires API credentials)",
+    "Fetch all open orders using a configured account",
     {
-      exchangeId: z
+      accountName: z
         .string()
-        .describe("Exchange ID (e.g., 'binance', 'coinbase')"),
-      marketType: z
-        .enum(["spot", "futures"])
-        .describe("Market type: 'spot' or 'futures'"),
+        .describe(
+          "Account name defined in the configuration file (e.g., 'bybit_main')"
+        ),
       symbol: z
         .string()
         .optional()
@@ -268,22 +236,11 @@ export function registerOrderTools(
         .optional()
         .describe("Additional exchange-specific parameters"),
     },
-    async ({ exchangeId, marketType, symbol, since, limit, params }) => {
+    async ({ accountName, symbol, since, limit, params }) => {
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId, marketType);
+        const exchange = ccxtServer.getExchangeInstance(accountName);
 
-        // API 키가 설정되어 있는지 확인
-        if (!exchange.apiKey || !exchange.secret) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: "API credentials not set. Please use setExchangeCredentials tool first.",
-              },
-            ],
-            isError: true,
-          };
-        }
+        // getExchangeInstance가 성공하면 인증은 보장됨
 
         // fetchOpenOrders 메서드가 지원되는지 확인
         if (!exchange.has["fetchOpenOrders"]) {
@@ -291,7 +248,7 @@ export function registerOrderTools(
             content: [
               {
                 type: "text",
-                text: `Exchange ${exchangeId} does not support fetching open orders`,
+                text: `Account '${accountName}' (Exchange: ${exchange.id}) does not support fetching open orders`,
               },
             ],
             isError: true,
@@ -318,7 +275,9 @@ export function registerOrderTools(
           content: [
             {
               type: "text",
-              text: `Error fetching open orders: ${(error as Error).message}`,
+              text: `Error fetching open orders for account '${accountName}': ${
+                (error as Error).message
+              }`,
             },
           ],
           isError: true,
@@ -330,14 +289,13 @@ export function registerOrderTools(
   // 마감된 주문 조회 도구
   server.tool(
     "fetchClosedOrders",
-    "Fetch all closed orders (requires API credentials)",
+    "Fetch all closed orders using a configured account",
     {
-      exchangeId: z
+      accountName: z
         .string()
-        .describe("Exchange ID (e.g., 'binance', 'coinbase')"),
-      marketType: z
-        .enum(["spot", "futures"])
-        .describe("Market type: 'spot' or 'futures'"),
+        .describe(
+          "Account name defined in the configuration file (e.g., 'bybit_main')"
+        ),
       symbol: z
         .string()
         .optional()
@@ -355,22 +313,11 @@ export function registerOrderTools(
         .optional()
         .describe("Additional exchange-specific parameters"),
     },
-    async ({ exchangeId, marketType, symbol, since, limit, params }) => {
+    async ({ accountName, symbol, since, limit, params }) => {
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId, marketType);
+        const exchange = ccxtServer.getExchangeInstance(accountName);
 
-        // API 키가 설정되어 있는지 확인
-        if (!exchange.apiKey || !exchange.secret) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: "API credentials not set. Please use setExchangeCredentials tool first.",
-              },
-            ],
-            isError: true,
-          };
-        }
+        // getExchangeInstance가 성공하면 인증은 보장됨
 
         // fetchClosedOrders 메서드가 지원되는지 확인
         if (!exchange.has["fetchClosedOrders"]) {
@@ -378,7 +325,7 @@ export function registerOrderTools(
             content: [
               {
                 type: "text",
-                text: `Exchange ${exchangeId} does not support fetching closed orders`,
+                text: `Account '${accountName}' (Exchange: ${exchange.id}) does not support fetching closed orders`,
               },
             ],
             isError: true,
@@ -405,7 +352,9 @@ export function registerOrderTools(
           content: [
             {
               type: "text",
-              text: `Error fetching closed orders: ${(error as Error).message}`,
+              text: `Error fetching closed orders for account '${accountName}': ${
+                (error as Error).message
+              }`,
             },
           ],
           isError: true,

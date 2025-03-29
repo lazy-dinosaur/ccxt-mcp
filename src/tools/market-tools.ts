@@ -19,9 +19,10 @@ export function registerMarketTools(server: McpServer, ccxtServer: CcxtMcpServer
     },
     async ({ exchangeId }) => {
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId);
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId);
         const markets = await exchange.loadMarkets();
-        
+
         return {
           content: [
             {
@@ -54,9 +55,10 @@ export function registerMarketTools(server: McpServer, ccxtServer: CcxtMcpServer
     },
     async ({ exchangeId, symbol }) => {
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId);
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId);
         const ticker = await exchange.fetchTicker(symbol);
-        
+
         return {
           content: [
             {
@@ -89,9 +91,10 @@ export function registerMarketTools(server: McpServer, ccxtServer: CcxtMcpServer
     },
     async ({ exchangeId, symbols }) => {
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId);
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId);
         const tickers = await exchange.fetchTickers(symbols);
-        
+
         return {
           content: [
             {
@@ -125,9 +128,10 @@ export function registerMarketTools(server: McpServer, ccxtServer: CcxtMcpServer
     },
     async ({ exchangeId, symbol, limit }) => {
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId);
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId);
         const orderbook = await exchange.fetchOrderBook(symbol, limit);
-        
+
         return {
           content: [
             {
@@ -162,9 +166,10 @@ export function registerMarketTools(server: McpServer, ccxtServer: CcxtMcpServer
     },
     async ({ exchangeId, symbol, since, limit }) => {
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId);
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId);
         const trades = await exchange.fetchTrades(symbol, since, limit);
-        
+
         return {
           content: [
             {
@@ -200,8 +205,9 @@ export function registerMarketTools(server: McpServer, ccxtServer: CcxtMcpServer
     },
     async ({ exchangeId, symbol, timeframe, since, limit }) => {
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId);
-        
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId);
+
         // 거래소가 OHLCV 데이터를 지원하는지 확인
         if (!exchange.has['fetchOHLCV']) {
           return {

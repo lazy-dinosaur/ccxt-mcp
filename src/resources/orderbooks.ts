@@ -37,7 +37,8 @@ export function registerOrderBookResources(
             if (!exchangeId) return [];
 
             try {
-              const exchange = ccxtServer.getExchangeInstance(
+              // 공개 인스턴스 사용 (자동완성용)
+              const exchange = ccxtServer.getPublicExchangeInstance(
                 exchangeId as string
               );
               await exchange.loadMarkets();
@@ -60,7 +61,8 @@ export function registerOrderBookResources(
       const limitNum = limit ? parseInt(limit as string, 10) : undefined;
 
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId as string);
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId as string);
         const orderbook = await exchange.fetchOrderBook(
           symbol as string,
           limitNum
@@ -108,7 +110,8 @@ export function registerOrderBookResources(
           if (!exchangeId) return [];
 
           try {
-            const exchange = ccxtServer.getExchangeInstance(
+            // 공개 인스턴스 사용 (자동완성용)
+            const exchange = ccxtServer.getPublicExchangeInstance(
               exchangeId as string
             );
             await exchange.loadMarkets();
@@ -129,7 +132,8 @@ export function registerOrderBookResources(
       const { exchangeId, symbol } = variables;
 
       try {
-        const exchange = ccxtServer.getExchangeInstance(exchangeId as string);
+        // 공개 인스턴스 사용
+        const exchange = ccxtServer.getPublicExchangeInstance(exchangeId as string);
         // L2 주문장은 더 자세한 주문장 정보를 제공
         const orderbook = await exchange.fetchL2OrderBook(symbol as string);
 
