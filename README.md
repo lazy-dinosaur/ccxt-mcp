@@ -192,6 +192,22 @@ User <--> AI Model(Claude/GPT) <--> MCP Protocol <--> CCXT MCP Server <--> Crypt
 
 When registered with Claude Desktop, you can make the following types of requests to AI models:
 
+### Cautions and Recommended Prompts
+
+When using AI models, consider the following cautions and use the prompt below for effective trading:
+
+```
+Your goal is to execute trades using the ccxt tools as much as possible
+Cautions:
+- Accurately identify whether it's a futures market or spot market before proceeding with trades
+- If there's no instruction about percentage of capital or amount to use, always calculate and execute trades using the entire available capital
+```
+
+**Notes:**
+- AI models sometimes confuse futures trading with spot trading.
+- Without clear guidance on trading capital size, AI might get confused.
+- Using the above prompt helps clearly communicate your trading intentions.
+
 ### Basic Query Examples
 
 ```
