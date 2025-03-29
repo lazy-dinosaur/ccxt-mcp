@@ -24,6 +24,7 @@ npx @lazydino/ccxt-mcp --config /path/to/config.json
 ```
 
 도움말 보기:
+
 ```bash
 npx @lazydino/ccxt-mcp --help
 ```
@@ -33,13 +34,15 @@ npx @lazydino/ccxt-mcp --help
 ### Claude Desktop에서 MCP 서버 등록하기
 
 1. **Claude Desktop 설정 열기**:
+
    - Claude Desktop 앱의 설정(Settings) 메뉴로 이동
    - "MCP Servers" 섹션 찾기
 
 2. **새 MCP 서버 추가**:
+
    - "Add Server" 버튼 클릭
    - 서버 이름: `ccxt-mcp`
-   - 명령어: `npx @lazydino/ccxt-mcp` 
+   - 명령어: `npx @lazydino/ccxt-mcp`
    - 추가 인수(선택 사항): `--config /path/to/config.json`
 
 3. **서버 저장 및 테스트**:
@@ -76,13 +79,14 @@ npx @lazydino/ccxt-mcp --help
 > ```json
 > "ccxt-mcp": {
 >   "command": "npx",
->   "args": ["@lazydino/ccxt-mcp", "--config", "/path/to/config.json"]
+>   "args": ["-y","@lazydino/ccxt-mcp", "--config", "/path/to/config.json"]
 > }
 > ```
 
 ## 주요 기능
 
 - **시장 정보 조회**:
+
   - 거래소 목록 조회
   - 거래소별 시장 정보 조회
   - 특정 심볼의 가격 정보 조회
@@ -90,12 +94,14 @@ npx @lazydino/ccxt-mcp --help
   - 과거 OHLCV 데이터 검색
 
 - **거래 기능**:
+
   - 시장가/지정가 주문 생성
   - 주문 취소 및 상태 조회
   - 계정 잔액 조회
   - 거래 내역 조회
 
 - **트레이딩 분석**:
+
   - 일/주/월 단위 성과 분석
   - 승률 계산 (최근 7일, 30일, 전체 기간)
   - 평균 수익/손실 비율 (R-multiple)
@@ -103,6 +109,7 @@ npx @lazydino/ccxt-mcp --help
   - 자산 변동 추적
 
 - **포지션 관리**:
+
   - 자본 대비 비율 매매 (예: 계정 자본의 5% 진입)
   - 선물 시장 레버리지 설정 (1-100x)
   - 동적 포지션 사이징 (변동성 기반)
@@ -139,12 +146,14 @@ Claude Desktop에 등록하면 AI 모델에게 다음과 같은 요청을 할 �
 ### 고급 트레이딩 쿼리 예시
 
 **포지션 관리**
+
 ```
-내 Bybit 계정(bybit_futures)에서 BTC/USDT 선물 시장에 자본의 5%로 10배 레버리지를 사용해 롱 포지션을 열어줘. 
+내 Bybit 계정(bybit_futures)에서 BTC/USDT 선물 시장에 자본의 5%로 10배 레버리지를 사용해 롱 포지션을 열어줘.
 이동평균선 교차 전략을 기반으로 진입하고, 최근 12개 5분봉 중 저점에 손절을 설정해.
 ```
 
 **성과 분석**
+
 ```
 지난 7일간의 내 Binance 계정(bybit_main) 거래 기록을 분석해서 승률, 평균 수익률, 최대 연속 손실을 보여줘.
 ```
@@ -157,32 +166,38 @@ Claude Desktop에 등록하면 AI 모델에게 다음과 같은 요청을 할 �
 
 ```javascript
 // 계정 자본의 5%로 10배 레버리지 롱 포지션 진입
-async function enterPositionWithCapitalRatio(client, accountName, symbol, capitalPercentage, leverage) {
+async function enterPositionWithCapitalRatio(
+  client,
+  accountName,
+  symbol,
+  capitalPercentage,
+  leverage,
+) {
   // 계정 잔액 조회
   const balance = await client.callTool({
     name: "fetchBalance",
-    arguments: { accountName }
+    arguments: { accountName },
   });
-  
+
   // 사용 가능한 USDT 가져오기
   const availableCapital = balance.free.USDT || 0;
-  
+
   // 진입 금액 계산 (자본의 5%)
   const entryCapital = availableCapital * (capitalPercentage / 100);
-  
+
   // 현재 시장 가격 가져오기
   const ticker = await client.callTool({
     name: "fetchTicker",
-    arguments: { exchangeId: "bybit", symbol }
+    arguments: { exchangeId: "bybit", symbol },
   });
-  
+
   // 거래량 계산
   const entryPrice = ticker.last;
   const amount = entryCapital / entryPrice;
-  
+
   // 레버리지 설정 (거래소별 구현 필요)
   await setupLeverage(client, accountName, symbol, leverage);
-  
+
   // 주문 생성 (선물 시장)
   return client.callTool({
     name: "createOrder",
@@ -194,9 +209,9 @@ async function enterPositionWithCapitalRatio(client, accountName, symbol, capita
       amount,
       params: {
         leverage: leverage,
-        marginMode: "cross"
-      }
-    }
+        marginMode: "cross",
+      },
+    },
   });
 }
 ```
@@ -205,34 +220,40 @@ async function enterPositionWithCapitalRatio(client, accountName, symbol, capita
 
 ```javascript
 // N개 캔들 중 저점 기준 손절 설정
-async function setStopLossBasedOnCandles(client, accountName, symbol, timeframe, candles) {
+async function setStopLossBasedOnCandles(
+  client,
+  accountName,
+  symbol,
+  timeframe,
+  candles,
+) {
   // 최근 캔들 데이터 가져오기
   const ohlcv = await client.callTool({
     name: "fetchOHLCV",
     arguments: {
-      exchangeId: accountName.split('-')[0],
+      exchangeId: accountName.split("-")[0],
       symbol,
       timeframe,
-      limit: candles
-    }
+      limit: candles,
+    },
   });
-  
+
   // 저점 찾기
-  const lows = ohlcv.map(candle => candle[3]); // 저가 (Low)
+  const lows = ohlcv.map((candle) => candle[3]); // 저가 (Low)
   const lowestPrice = Math.min(...lows);
-  
+
   // 오픈 포지션 찾기
   const positions = await client.callTool({
     name: "fetchPositions",
-    arguments: { accountName, symbol }
+    arguments: { accountName, symbol },
   });
-  
+
   if (positions.length === 0) {
     throw new Error("No open positions found");
   }
-  
+
   const position = positions[0];
-  
+
   // 손절 주문 생성
   return client.callTool({
     name: "createOrder",
@@ -245,9 +266,9 @@ async function setStopLossBasedOnCandles(client, accountName, symbol, timeframe,
       price: lowestPrice * 0.995, // 약간의 슬리피지 추가
       params: {
         stopPrice: lowestPrice,
-        reduceOnly: true
-      }
-    }
+        reduceOnly: true,
+      },
+    },
   });
 }
 ```
