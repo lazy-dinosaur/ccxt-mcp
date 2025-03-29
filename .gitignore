@@ -1,4 +1,23 @@
+# 개발 도구 및 환경
 .aider*
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
 
-/dist
+# 의존성 및 드
 /node_modules
+/dist
+/coverage
+*.log
+*.tsbuildinfo
+
+# 환경 변수 파일
+.env
+.env.local
+.env*.local
+
+# 테스트 결과
+/junit.xml
+/test-results/
