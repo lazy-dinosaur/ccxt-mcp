@@ -1,59 +1,61 @@
 # CCXT MCP Server
 
-CCXT MCP 서버는 [Model Context Protocol (MCP)](https://github.com/anthropics/anthropic-cookbook/tree/main/model-context-protocol)을 통해 AI 모델이 암호화폐 거래소 API와 상호작용할 수 있도록 하는 서버입니다. 이 서버는 [CCXT 라이브러리](https://github.com/ccxt/ccxt)를 사용하여 100개 이상의 암호화폐 거래소에 접근하고 거래할 수 있는 기능을 제공합니다.
+[한국어 버전(Korean version)](README.ko.md)
 
-## 설치 및 사용법
+CCXT MCP Server is a server that allows AI models to interact with cryptocurrency exchange APIs through the [Model Context Protocol (MCP)](https://github.com/anthropics/anthropic-cookbook/tree/main/model-context-protocol). This server uses the [CCXT library](https://github.com/ccxt/ccxt) to provide access to more than 100 cryptocurrency exchanges and their trading capabilities.
 
-### 글로벌 설치
+## Installation and Usage
+
+### Global Installation
 
 ```bash
-# 패키지 전역 설치
+# Install the package globally
 npm install -g @lazydino/ccxt-mcp
 ```
 
-### npx로 실행하기
+### Running with npx
 
-설치 없이 바로 실행할 수 있습니다:
+You can run it directly without installation:
 
 ```bash
-# 기본 설정 사용
+# Using default settings
 npx @lazydino/ccxt-mcp
 
-# 사용자 지정 설정 파일 사용
+# Using custom configuration file
 npx @lazydino/ccxt-mcp --config /path/to/config.json
 ```
 
-도움말 보기:
+View help:
 
 ```bash
 npx @lazydino/ccxt-mcp --help
 ```
 
-## 설정 방법
+## Configuration
 
-### Claude Desktop에서 MCP 서버 등록하기
+### Registering the MCP Server in Claude Desktop
 
-1. **Claude Desktop 설정 열기**:
+1. **Open Claude Desktop Settings**:
 
-   - Claude Desktop 앱의 설정(Settings) 메뉴로 이동
-   - "MCP Servers" 섹션 찾기
+   - Go to the Settings menu in the Claude Desktop app
+   - Find the "MCP Servers" section
 
-2. **새 MCP 서버 추가**:
+2. **Add a New MCP Server**:
 
-   - "Add Server" 버튼 클릭
-   - 서버 이름: `ccxt-mcp`
-   - 명령어: `npx @lazydino/ccxt-mcp`
-   - 추가 인수(선택 사항): `--config /path/to/config.json`
+   - Click the "Add Server" button
+   - Server name: `ccxt-mcp`
+   - Command: `npx @lazydino/ccxt-mcp`
+   - Additional arguments (optional): `--config /path/to/config.json`
 
-3. **서버 저장 및 테스트**:
-   - 설정 저장
-   - "Test Connection" 버튼으로 연결 테스트
+3. **Save and Test the Server**:
+   - Save the settings
+   - Test the connection with the "Test Connection" button
 
-### 설정 방법 - 두 가지 옵션
+### Configuration Methods - Two Options
 
-#### 옵션 1: Claude Desktop 설정 파일 내에 직접 계정 정보 포함 (기본 방식)
+#### Option 1: Include Account Information Directly in Claude Desktop Settings (Basic Method)
 
-이 방식은 Claude Desktop 설정 파일(claude_desktop_config.json) 내에 직접 CCXT 계정 정보를 포함합니다:
+This method includes CCXT account information directly in the Claude Desktop settings file (claude_desktop_config.json):
 
 ```json
 {
@@ -82,13 +84,13 @@ npx @lazydino/ccxt-mcp --help
 }
 ```
 
-이 방식을 사용하면 별도의 설정 파일이 필요하지 않습니다. 모든 설정이 Claude Desktop 구성 파일에 통합됩니다.
+Using this method, you don't need a separate configuration file. All settings are integrated into the Claude Desktop configuration file.
 
-#### 옵션 2: 별도 설정 파일 사용 (고급 방식)
+#### Option 2: Using a Separate Configuration File (Advanced Method)
 
-계정 정보를 별도의 설정 파일로 분리하려면 다음과 같이 구성하세요:
+To separate account information into a separate configuration file, set up as follows:
 
-1. **별도 설정 파일 생성** (예: `ccxt-accounts.json`):
+1. **Create a Separate Configuration File** (e.g., `ccxt-accounts.json`):
 
 ```json
 {
@@ -111,7 +113,7 @@ npx @lazydino/ccxt-mcp --help
 }
 ```
 
-2. **Claude Desktop 설정에서 설정 파일 경로 지정**:
+2. **Specify the Configuration File Path in Claude Desktop Settings**:
 
 ```json
 {
@@ -129,96 +131,96 @@ npx @lazydino/ccxt-mcp --help
 }
 ```
 
-> **별도 설정 파일을 사용하는 이유**:
+> **Reasons to Use a Separate Configuration File**:
 >
-> - 재귀 참조 문제 방지
-> - API 키와 같은 민감한 정보 분리
-> - 다중 환경 설정 용이(개발, 테스트, 프로덕션)
-> - 설정 파일 버전 관리 개선
+> - Prevents recursive reference issues
+> - Separates sensitive information like API keys
+> - Easier multi-environment configuration (development, testing, production)
+> - Improved configuration file version control
 
-## 주요 기능
+## Key Features
 
-- **시장 정보 조회**:
+- **Market Information Retrieval**:
 
-  - 거래소 목록 조회
-  - 거래소별 시장 정보 조회
-  - 특정 심볼의 가격 정보 조회
-  - 특정 심볼의 주문장 정보 조회
-  - 과거 OHLCV 데이터 검색
+  - List exchanges
+  - View market information by exchange
+  - Get price information for specific symbols
+  - View order book information for specific symbols
+  - Search historical OHLCV data
 
-- **거래 기능**:
+- **Trading Functions**:
 
-  - 시장가/지정가 주문 생성
-  - 주문 취소 및 상태 조회
-  - 계정 잔액 조회
-  - 거래 내역 조회
+  - Create market/limit orders
+  - Cancel orders and check status
+  - View account balances
+  - Check trading history
 
-- **트레이딩 분석**:
+- **Trading Analysis**:
 
-  - 일/주/월 단위 성과 분석
-  - 승률 계산 (최근 7일, 30일, 전체 기간)
-  - 평균 수익/손실 비율 (R-multiple)
-  - 최대 연속 손실/이익 시리즈 분석
-  - 자산 변동 추적
+  - Daily/weekly/monthly performance analysis
+  - Win rate calculation (last 7 days, 30 days, all time)
+  - Average profit/loss ratio (R-multiple)
+  - Maximum consecutive loss/profit series analysis
+  - Asset variation tracking
 
-- **포지션 관리**:
+- **Position Management**:
 
-  - 자본 대비 비율 매매 (예: 계정 자본의 5% 진입)
-  - 선물 시장 레버리지 설정 (1-100x)
-  - 동적 포지션 사이징 (변동성 기반)
-  - 분할 매수/매도 전략 구현
+  - Capital ratio trading (e.g., enter with 5% of account capital)
+  - Futures market leverage setting (1-100x)
+  - Dynamic position sizing (volatility-based)
+  - Split buy/sell strategy implementation
 
-- **리스크 관리**:
-  - 기술적 지표 기반 손절매 설정 (예: 5분봉 기준 10개 캔들 중 저점)
-  - 변동성 기반 손절매/익절매 (ATR 배수)
-  - 최대 허용 손실 제한 (일별/주별)
-  - 동적 익절매 설정 (추종형 이익 확정)
+- **Risk Management**:
+  - Technical indicator-based stop loss setting (e.g., lowest point among 10 candles on 5-minute chart)
+  - Volatility-based stop loss/take profit (ATR multiples)
+  - Maximum allowable loss limit (daily/weekly)
+  - Dynamic take profit setting (trailing profit)
 
-## 작동 방식
-
-```
-사용자 <--> AI 모델(Claude/GPT) <--> MCP 프로토콜 <--> CCXT MCP 서버 <--> 암호화폐 거래소 API
-```
-
-1. **사용자**: "비트코인 가격을 알려줘" 또는 "내 바이낸스 계정에서 이더리움 구매해줘"와 같은 요청
-2. **AI 모델**: 사용자 요청을 이해하고 어떤 MCP 도구/리소스를 사용할지 결정
-3. **MCP 프로토콜**: AI와 CCXT MCP 서버 간의 표준화된 통신
-4. **CCXT MCP 서버**: CCXT 라이브러리를 사용하여 암호화폐 거래소 API와 통신
-5. **거래소 API**: 실제 데이터 제공 및 거래 주문 실행
-
-## AI 모델과 함께 사용하기
-
-Claude Desktop에 등록하면 AI 모델에게 다음과 같은 요청을 할 수 있습니다:
-
-### 기본 쿼리 예시
+## How It Works
 
 ```
-비트코인 현재 가격을 binance와 coinbase에서 조회하고 비교해줘.
+User <--> AI Model(Claude/GPT) <--> MCP Protocol <--> CCXT MCP Server <--> Cryptocurrency Exchange API
 ```
 
-### 고급 트레이딩 쿼리 예시
+1. **User**: Requests like "Tell me the Bitcoin price" or "Buy Ethereum on my Binance account"
+2. **AI Model**: Understands user requests and determines which MCP tools/resources to use
+3. **MCP Protocol**: Standardized communication between AI and CCXT MCP server
+4. **CCXT MCP Server**: Communicates with cryptocurrency exchange APIs using the CCXT library
+5. **Exchange API**: Provides actual data and executes trade orders
 
-**포지션 관리**
+## Using with AI Models
+
+When registered with Claude Desktop, you can make the following types of requests to AI models:
+
+### Basic Query Examples
 
 ```
-내 Bybit 계정(bybit_futures)에서 BTC/USDT 선물 시장에 자본의 5%로 10배 레버리지를 사용해 롱 포지션을 열어줘.
-이동평균선 교차 전략을 기반으로 진입하고, 최근 12개 5분봉 중 저점에 손절을 설정해.
+Check and compare the current Bitcoin price on binance and coinbase.
 ```
 
-**성과 분석**
+### Advanced Trading Query Examples
+
+**Position Management**
 
 ```
-지난 7일간의 내 Binance 계정(bybit_main) 거래 기록을 분석해서 승률, 평균 수익률, 최대 연속 손실을 보여줘.
+Open a long position on BTC/USDT futures market in my Bybit account (bybit_futures) with 5% of capital using 10x leverage.
+Enter based on moving average crossover strategy and set stop loss at the lowest point among the 12 most recent 5-minute candles.
 ```
 
-## 고급 사용법 예시
+**Performance Analysis**
 
-다음은 CCXT MCP를 활용한 고급 트레이딩 기능 구현 예시입니다:
+```
+Analyze my Binance account (bybit_main) trading records for the last 7 days and show me the win rate, average profit, and maximum consecutive losses.
+```
 
-### 포지션 자본 비율 및 레버리지 설정
+## Advanced Usage Examples
+
+Here are examples of advanced trading features implemented using CCXT MCP:
+
+### Position Capital Ratio and Leverage Setting
 
 ```javascript
-// 계정 자본의 5%로 10배 레버리지 롱 포지션 진입
+// Enter a long position with 5% of account capital and 10x leverage
 async function enterPositionWithCapitalRatio(
   client,
   accountName,
@@ -226,32 +228,32 @@ async function enterPositionWithCapitalRatio(
   capitalPercentage,
   leverage,
 ) {
-  // 계정 잔액 조회
+  // Check account balance
   const balance = await client.callTool({
     name: "fetchBalance",
     arguments: { accountName },
   });
 
-  // 사용 가능한 USDT 가져오기
+  // Get available USDT
   const availableCapital = balance.free.USDT || 0;
 
-  // 진입 금액 계산 (자본의 5%)
+  // Calculate entry amount (5% of capital)
   const entryCapital = availableCapital * (capitalPercentage / 100);
 
-  // 현재 시장 가격 가져오기
+  // Get current market price
   const ticker = await client.callTool({
     name: "fetchTicker",
     arguments: { exchangeId: "bybit", symbol },
   });
 
-  // 거래량 계산
+  // Calculate volume
   const entryPrice = ticker.last;
   const amount = entryCapital / entryPrice;
 
-  // 레버리지 설정 (거래소별 구현 필요)
+  // Set leverage (needs exchange-specific implementation)
   await setupLeverage(client, accountName, symbol, leverage);
 
-  // 주문 생성 (선물 시장)
+  // Create order (futures market)
   return client.callTool({
     name: "createOrder",
     arguments: {
@@ -269,10 +271,10 @@ async function enterPositionWithCapitalRatio(
 }
 ```
 
-### 캔들 기반 손절 설정
+### Candle-Based Stop Loss Setting
 
 ```javascript
-// N개 캔들 중 저점 기준 손절 설정
+// Set stop loss based on the lowest point among N candles
 async function setStopLossBasedOnCandles(
   client,
   accountName,
@@ -280,7 +282,7 @@ async function setStopLossBasedOnCandles(
   timeframe,
   candles,
 ) {
-  // 최근 캔들 데이터 가져오기
+  // Get recent candle data
   const ohlcv = await client.callTool({
     name: "fetchOHLCV",
     arguments: {
@@ -291,11 +293,11 @@ async function setStopLossBasedOnCandles(
     },
   });
 
-  // 저점 찾기
-  const lows = ohlcv.map((candle) => candle[3]); // 저가 (Low)
+  // Find the lowest point
+  const lows = ohlcv.map((candle) => candle[3]); // Low price
   const lowestPrice = Math.min(...lows);
 
-  // 오픈 포지션 찾기
+  // Find open positions
   const positions = await client.callTool({
     name: "fetchPositions",
     arguments: { accountName, symbol },
@@ -307,7 +309,7 @@ async function setStopLossBasedOnCandles(
 
   const position = positions[0];
 
-  // 손절 주문 생성
+  // Create stop loss order
   return client.callTool({
     name: "createOrder",
     arguments: {
@@ -316,7 +318,7 @@ async function setStopLossBasedOnCandles(
       type: "stop",
       side: position.side === "long" ? "sell" : "buy",
       amount: position.amount,
-      price: lowestPrice * 0.995, // 약간의 슬리피지 추가
+      price: lowestPrice * 0.995, // Add a small slippage
       params: {
         stopPrice: lowestPrice,
         reduceOnly: true,
@@ -326,24 +328,24 @@ async function setStopLossBasedOnCandles(
 }
 ```
 
-## 개발
+## Development
 
-### 소스에서 빌드하기
+### Building from Source
 
 ```bash
-# 저장소 클론
+# Clone repository
 git clone https://github.com/lazy-dinosaur/ccxt-mcp.git
 
-# 프로젝트 디렉토리로 이동
+# Navigate to project directory
 cd ccxt-mcp
 
-# 의존성 설치
+# Install dependencies
 npm install
 
-# 빌드
+# Build
 npm run build
 ```
 
-## 라이센스
+## License
 
-MIT 라이센스로 배포됩니다. 자세한 내용은 LICENSE 파일을 참조하세요.
+Distributed under the MIT License. See the LICENSE file for more information.
