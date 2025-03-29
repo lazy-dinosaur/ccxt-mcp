@@ -54,13 +54,26 @@ export class CcxtMcpServer {
   private exchangeInstances: Record<string, Exchange> = {};
   // Key: `${exchangeId}-${marketType}`, Value: Public (unauthenticated) CCXT Exchange instance
   private publicExchangeInstances: Record<string, Exchange> = {};
+  // 설정 파일 경로
+  private configPath: string;
 
-  constructor() {
+  /**
+   * @param configPath 사용자 지정 설정 파일 경로 (선택 사항)
+   */
+  constructor(configPath?: string) {
     // MCP 서버 초기화
     this.server = new McpServer({
       name: "CCXT MCP",
       version: "1.0.0",
     });
+
+    // 설정 파일 경로 설정
+    this.configPath = configPath || path.join(
+      os.homedir(),
+      ".config",
+      "Claude",
+      "claude_desktop_config.json"
+    );
 
     // 설정 파일에서 계정 로드 및 거래소 인스턴스 초기화
     this.loadAccountsFromConfig();
@@ -74,15 +87,9 @@ export class CcxtMcpServer {
    * 설정 파일에서 계정 정보를 로드하고 CCXT 인스턴스를 생성합니다.
    */
   private async loadAccountsFromConfig() {
-    const configPath = path.join(
-      os.homedir(),
-      ".config",
-      "Claude",
-      "claude_desktop_config.json",
-    );
-
     try {
-      const configContent = fs.readFileSync(configPath, "utf-8");
+      console.log(`설정 파일을 로드합니다: ${this.configPath}`);
+      const configContent = fs.readFileSync(this.configPath, "utf-8");
 
       let config;
       try {
@@ -97,7 +104,7 @@ export class CcxtMcpServer {
       const mcpConfig = config?.mcpServers?.["ccxt-mcp"];
       if (!mcpConfig || !Array.isArray(mcpConfig.accounts)) {
         console.warn(
-          `'mcpServers.ccxt-mcp.accounts' not found or not an array in ${configPath}. No accounts pre-loaded.`,
+          `'mcpServers.ccxt-mcp.accounts' not found or not an array in ${this.configPath}. No accounts pre-loaded.`,
         );
         return;
       }
@@ -182,10 +189,10 @@ export class CcxtMcpServer {
       }
     } catch (error) {
       console.error(
-        `Failed to load or parse configuration file ${configPath}:`,
+        `Failed to load or parse configuration file ${this.configPath}:`,
         error,
       );
-      // Consider if the server should fail to start if config is essential
+      console.log('계정 설정이 로드되지 않았습니다. 공개 거래소 데이터만 사용 가능합니다.');
     }
   } // loadAccountsFromConfig 메소드 닫는 괄호
 

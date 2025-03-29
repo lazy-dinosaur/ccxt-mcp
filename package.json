@@ -1,9 +1,12 @@
 {
-  "name": "ccxt-mcp",
+  "name": "@lazy-dinosaur/ccxt-mcp",
   "version": "0.1.0",
   "description": "CCXT integration for Model Context Protocol",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "ccxt-mcp": "./bin/ccxt-mcp.js"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
@@ -19,7 +22,7 @@
     "exchange",
     "api"
   ],
-  "author": "LazyDino",
+  "author": "Lazy-Dinosaur",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.8.0",
@@ -34,5 +37,20 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lazy-dinosaur/ccxt-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lazy-dinosaur/ccxt-mcp/issues"
+  },
+  "homepage": "https://github.com/lazy-dinosaur/ccxt-mcp#readme"
 }
