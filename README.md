@@ -8,7 +8,7 @@ CCXT MCP 서버는 [Model Context Protocol (MCP)](https://github.com/anthropics/
 
 ```bash
 # 패키지 전역 설치
-npm install -g @lazy-dinosaur/ccxt-mcp
+npm install -g @lazydino/ccxt-mcp
 ```
 
 ### npx로 실행하기
@@ -17,15 +17,15 @@ npm install -g @lazy-dinosaur/ccxt-mcp
 
 ```bash
 # 기본 설정 사용
-npx @lazy-dinosaur/ccxt-mcp
+npx @lazydino/ccxt-mcp
 
 # 사용자 지정 설정 파일 사용
-npx @lazy-dinosaur/ccxt-mcp --config /path/to/config.json
+npx @lazydino/ccxt-mcp --config /path/to/config.json
 ```
 
 도움말 보기:
 ```bash
-npx @lazy-dinosaur/ccxt-mcp --help
+npx @lazydino/ccxt-mcp --help
 ```
 
 ## 설정 방법
@@ -39,7 +39,7 @@ npx @lazy-dinosaur/ccxt-mcp --help
 2. **새 MCP 서버 추가**:
    - "Add Server" 버튼 클릭
    - 서버 이름: `ccxt-mcp`
-   - 명령어: `npx @lazy-dinosaur/ccxt-mcp` 
+   - 명령어: `npx @lazydino/ccxt-mcp` 
    - 추가 인수(선택 사항): `--config /path/to/config.json`
 
 3. **서버 저장 및 테스트**:
@@ -76,7 +76,7 @@ npx @lazy-dinosaur/ccxt-mcp --help
 > ```json
 > "ccxt-mcp": {
 >   "command": "npx",
->   "args": ["@lazy-dinosaur/ccxt-mcp", "--config", "/path/to/config.json"]
+>   "args": ["@lazydino/ccxt-mcp", "--config", "/path/to/config.json"]
 > }
 > ```
 

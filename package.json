@@ -1,5 +1,5 @@
 {
-  "name": "@lazy-dinosaur/ccxt-mcp",
+  "name": "@lazydino/ccxt-mcp",
   "version": "0.1.0",
   "description": "CCXT integration for Model Context Protocol",
   "type": "module",
@@ -22,7 +22,7 @@
     "exchange",
     "api"
   ],
-  "author": "Lazy-Dinosaur",
+  "author": "LazyDino",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.8.0",
