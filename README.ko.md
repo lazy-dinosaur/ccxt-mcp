@@ -1,8 +1,30 @@
 # CCXT MCP Server
 
+[![npm version](https://img.shields.io/npm/v/@lazydino/ccxt-mcp.svg)](https://www.npmjs.com/package/@lazydino/ccxt-mcp)
+[![npm downloads](https://img.shields.io/npm/dm/@lazydino/ccxt-mcp.svg)](https://www.npmjs.com/package/@lazydino/ccxt-mcp)
+[![GitHub stars](https://img.shields.io/github/stars/lazy-dinosaur/ccxt-mcp.svg)](https://github.com/lazy-dinosaur/ccxt-mcp/stargazers)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 [English version(영어 버전)](README.md)
 
 CCXT MCP 서버는 [Model Context Protocol (MCP)](https://github.com/anthropics/anthropic-cookbook/tree/main/model-context-protocol)을 통해 AI 모델이 암호화폐 거래소 API와 상호작용할 수 있도록 하는 서버입니다. 이 서버는 [CCXT 라이브러리](https://github.com/ccxt/ccxt)를 사용하여 100개 이상의 암호화폐 거래소에 접근하고 거래할 수 있는 기능을 제공합니다.
+
+<p align="center">
+  <img src="https://github.com/lazy-dinosaur/ccxt-mcp/assets/35533379/a4eaa4a7-0845-4a2d-b80f-842b46881ab7" alt="CCXT MCP 다이어그램" width="600">
+</p>
+
+## 🚀 빠른 시작
+
+```bash
+# 패키지 전역 설치
+npm install -g @lazydino/ccxt-mcp
+
+# 기본 설정으로 실행
+ccxt-mcp
+
+# 또는 설치 없이 실행
+npx @lazydino/ccxt-mcp
+```
 
 ## 설치 및 사용법
 
@@ -362,6 +384,18 @@ npm install
 npm run build
 ```
 
-## 라이센스
+## 📚 문서
+
+자세한 문서는 [위키](https://github.com/lazy-dinosaur/ccxt-mcp/wiki)를 참조하세요.
+
+## 🤝 기여하기
+
+기여는 언제나 환영합니다! Pull Request를 자유롭게 제출해 주세요.
+
+## 📄 라이센스
 
 MIT 라이센스로 배포됩니다. 자세한 내용은 LICENSE 파일을 참조하세요.
+
+## ❤️ 지원하기
+
+이 프로젝트가 유용하다고 생각하시면, GitHub에 ⭐️을 눌러주세요!
