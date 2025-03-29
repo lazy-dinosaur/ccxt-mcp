@@ -68,12 +68,14 @@ export class CcxtMcpServer {
     });
 
     // 설정 파일 경로 설정
-    this.configPath = configPath || path.join(
-      os.homedir(),
-      ".config",
-      "Claude",
-      "claude_desktop_config.json"
-    );
+    this.configPath =
+      configPath ||
+      path.join(
+        os.homedir(),
+        ".config",
+        "Claude",
+        "claude_desktop_config.json",
+      );
 
     // 설정 파일에서 계정 로드 및 거래소 인스턴스 초기화
     this.loadAccountsFromConfig();
@@ -88,7 +90,6 @@ export class CcxtMcpServer {
    */
   private async loadAccountsFromConfig() {
     try {
-      console.log(`설정 파일을 로드합니다: ${this.configPath}`);
       const configContent = fs.readFileSync(this.configPath, "utf-8");
 
       let config;
@@ -163,16 +164,16 @@ export class CcxtMcpServer {
               margin: exchangeInstance.has.margin,
               future: exchangeInstance.has.futures,
               swap: exchangeInstance.has.swap,
-              option: exchangeInstance.has.option
+              option: exchangeInstance.has.option,
             };
-            
+
             if (!supportedTypes[account.defaultType]) {
               console.error(
                 `${account.exchangeId} does not support ${account.defaultType} trading. ` +
-                `Supported types: ${Object.entries(supportedTypes)
-                  .filter(([_, supported]) => supported)
-                  .map(([type]) => type)
-                  .join(', ')}`
+                  `Supported types: ${Object.entries(supportedTypes)
+                    .filter(([_, supported]) => supported)
+                    .map(([type]) => type)
+                    .join(", ")}`,
               );
               continue;
             }
@@ -192,7 +193,6 @@ export class CcxtMcpServer {
         `Failed to load or parse configuration file ${this.configPath}:`,
         error,
       );
-      console.log('계정 설정이 로드되지 않았습니다. 공개 거래소 데이터만 사용 가능합니다.');
     }
   } // loadAccountsFromConfig 메소드 닫는 괄호
 
@@ -282,7 +282,6 @@ export class CcxtMcpServer {
   getAccountNames(): string[] {
     return Object.keys(this.exchangeInstances);
   }
-
 
   getPublicExchangeInstance(
     exchangeId: string,
