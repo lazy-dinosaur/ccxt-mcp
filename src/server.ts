@@ -162,7 +162,7 @@ export class CcxtMcpServer {
             const supportedTypes = {
               spot: exchangeInstance.has.spot,
               margin: exchangeInstance.has.margin,
-              future: exchangeInstance.has.futures,
+              future: exchangeInstance.has.future,
               swap: exchangeInstance.has.swap,
               option: exchangeInstance.has.option,
             };
