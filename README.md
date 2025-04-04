@@ -180,6 +180,9 @@ To separate account information into a separate configuration file, set up as fo
   - Average profit/loss ratio (R-multiple)
   - Maximum consecutive loss/profit series analysis
   - Asset variation tracking
+  - Comprehensive performance metrics
+  - Trade pattern recognition
+  - Period-based return calculations
 
 - **Position Management**:
 
@@ -246,6 +249,20 @@ Enter based on moving average crossover strategy and set stop loss at the lowest
 
 ```
 Analyze my Binance account (bybit_main) trading records for the last 7 days and show me the win rate, average profit, and maximum consecutive losses.
+```
+
+**Detailed Trading Analytics**
+
+```
+Analyze my trading performance on the bybit_futures account for BTC/USDT over the last 30 days. Calculate win rate, profit factor, and identify any patterns in my winning trades.
+```
+
+```
+Show me the monthly returns for my bybit_main account over the past 90 days and identify my best and worst trading months.
+```
+
+```
+Analyze my consecutive wins and losses on my bybit_futures account and tell me if I have any psychological patterns affecting my trading after losses.
 ```
 
 ## Development

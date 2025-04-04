@@ -22,6 +22,7 @@ import { registerOrderBookResources } from "./resources/orderbooks.js"; // Resto
 import { registerMarketTools } from "./tools/market-tools.js"; // Restore .js
 import { registerOrderTools } from "./tools/order-tools.js"; // Restore .js
 import { registerAccountTools } from "./tools/account-tools.js"; // Restore .js
+import { registerAnalysisTools } from "./tools/analysis-tools.js"; // 거래 분석 도구
 
 // 설정 파일의 계정 구조 정의
 interface AccountConfig {
@@ -337,6 +338,7 @@ export class CcxtMcpServer {
     registerMarketTools(this.server, this);
     registerOrderTools(this.server, this);
     registerAccountTools(this.server, this);
+    registerAnalysisTools(this.server, this);
   }
 
   /**
