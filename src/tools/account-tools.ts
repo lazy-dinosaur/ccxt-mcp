@@ -19,7 +19,41 @@ export function registerAccountTools(
     "List all configured account names",
     {},
     async () => {
+      console.error(`[DEBUG] listAccounts tool called`);
       const accountNames = ccxtServer.getAccountNames();
+      
+      if (accountNames.length === 0) {
+        console.error(`[WARN] No accounts found in listAccounts tool`);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `No accounts were loaded from the configuration. Please check your config file at: ${ccxtServer['configPath']}
+              
+Possible issues:
+1. The config file doesn't exist
+2. The config file doesn't have the correct format (should have an 'accounts' array)
+3. API keys in the config file are invalid
+4. Permission issues with accessing the config file
+              
+Your config should look like:
+{
+  "accounts": [
+    {
+      "name": "account_name",
+      "exchangeId": "exchange_id", 
+      "apiKey": "your_api_key",
+      "secret": "your_secret_key",
+      "defaultType": "spot"
+    }
+  ]
+}`,
+            },
+          ],
+        };
+      }
+      
+      console.error(`[DEBUG] Returning ${accountNames.length} accounts from listAccounts tool`);
       return {
         content: [
           {

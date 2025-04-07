@@ -131,6 +131,8 @@ npx @lazydino/ccxt-mcp --help
 }
 ```
 
+> **중요**: 설정 파일은 위와 같이 루트 수준에 `accounts` 배열을 포함해야 합니다.
+
 2. **Claude Desktop 설정에서 설정 파일 경로 지정**:
 
 ```json
@@ -148,6 +150,17 @@ npx @lazydino/ccxt-mcp --help
   }
 }
 ```
+
+> **참고**: `--config` 옵션으로 별도 설정 파일을 사용할 때, 서버는 `mcpServers.ccxt-mcp.accounts` 경로가 아닌 JSON 파일의 루트에서 직접 `accounts` 배열을 찾습니다.
+
+3. **명령줄에서 외부 설정 파일 사용하기**:
+
+```bash
+# 사용자 지정 설정 파일 사용
+npx @lazydino/ccxt-mcp --config /path/to/ccxt-accounts.json
+```
+
+저장소의 `examples/config-example.json`에서 예제 설정 파일을 찾을 수 있습니다.
 
 > **별도 설정 파일을 사용하는 이유**:
 >

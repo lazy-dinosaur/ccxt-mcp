@@ -65,7 +65,7 @@ export class CcxtMcpServer {
     // MCP 서버 초기화
     this.server = new McpServer({
       name: "CCXT MCP",
-      version: "1.0.0",
+      version: "4.0.0",
     });
 
     // 설정 파일 경로 설정
@@ -91,27 +91,59 @@ export class CcxtMcpServer {
    */
   private async loadAccountsFromConfig() {
     try {
+      console.error(`[DEBUG] Loading config from: ${this.configPath}`);
+      
+      // 파일 존재 확인
+      if (!fs.existsSync(this.configPath)) {
+        console.error(`[ERROR] Config file not found: ${this.configPath}`);
+        return;
+      }
+      
       const configContent = fs.readFileSync(this.configPath, "utf-8");
-
+      console.error(`[DEBUG] Config file size: ${configContent.length} bytes`);
+      
       let config;
       try {
         config = JSON.parse(configContent);
+        console.error(`[DEBUG] Successfully parsed JSON config`);
       } catch (jsonError) {
+        console.error(`[ERROR] Invalid JSON in config file: ${jsonError.message}`);
         throw new Error(
           `Invalid JSON format in config file: ${jsonError.message}`,
         );
       }
 
-      // 새로운 구조에서는 mcpServers.ccxt-mcp.accounts에 계정 정보가 있습니다
-      const mcpConfig = config?.mcpServers?.["ccxt-mcp"];
-      if (!mcpConfig || !Array.isArray(mcpConfig.accounts)) {
-        console.warn(
-          `'mcpServers.ccxt-mcp.accounts' not found or not an array in ${this.configPath}. No accounts pre-loaded.`,
-        );
-        return;
+      let accounts: AccountConfig[] = [];
+      
+      // 먼저 직접 외부 설정 파일에서 계정 정보를 확인
+      if (Array.isArray(config.accounts)) {
+        console.error(`[DEBUG] Found ${config.accounts.length} accounts directly in config file`);
+        accounts = config.accounts;
+      } 
+      // 외부 설정 파일에 계정 정보가 없으면 Claude Desktop 설정 구조 확인
+      else {
+        console.error(`[DEBUG] No direct 'accounts' array found, checking mcpServers structure`);
+        // 새로운 구조에서는 mcpServers.ccxt-mcp.accounts에 계정 정보가 있습니다
+        const mcpConfig = config?.mcpServers?.["ccxt-mcp"];
+        if (!mcpConfig || !Array.isArray(mcpConfig.accounts)) {
+          console.error(
+            `[ERROR] Neither 'accounts' array nor 'mcpServers.ccxt-mcp.accounts' found in config`
+          );
+          console.error(`[DEBUG] Config structure: ${JSON.stringify(Object.keys(config))}`);
+          return;
+        }
+        console.error(`[DEBUG] Found ${mcpConfig.accounts.length} accounts in mcpServers.ccxt-mcp.accounts`);
+        accounts = mcpConfig.accounts;
       }
 
-      const accounts: AccountConfig[] = mcpConfig.accounts;
+      // 계정이 없는 경우 로그 출력
+      if (accounts.length === 0) {
+        console.error(`[ERROR] No accounts found in configuration file: ${this.configPath}`);
+        return;
+      }
+      
+      console.error(`[INFO] Found ${accounts.length} account(s) in configuration`);
+      console.error(`[DEBUG] Account names: ${accounts.map(a => a.name).join(', ')}`);
 
       const loadedAccountNames = new Set<string>();
       for (const account of accounts) {
@@ -281,7 +313,9 @@ export class CcxtMcpServer {
    * 로드된 모든 계정 이름 목록을 반환합니다.
    */
   getAccountNames(): string[] {
-    return Object.keys(this.exchangeInstances);
+    const accountNames = Object.keys(this.exchangeInstances);
+    console.error(`[DEBUG] getAccountNames() called, returning ${accountNames.length} accounts: ${accountNames.join(', ')}`);
+    return accountNames;
   }
 
   getPublicExchangeInstance(

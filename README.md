@@ -131,6 +131,8 @@ To separate account information into a separate configuration file, set up as fo
 }
 ```
 
+> **Important**: The configuration file must contain an `accounts` array at the root level, as shown above.
+
 2. **Specify the Configuration File Path in Claude Desktop Settings**:
 
 ```json
@@ -148,6 +150,17 @@ To separate account information into a separate configuration file, set up as fo
   }
 }
 ```
+
+> **Note**: When using a separate configuration file with the `--config` option, the server will look for the `accounts` array directly in the root of the JSON file, not in `mcpServers.ccxt-mcp.accounts` path.
+
+3. **Running with External Configuration File from Command Line**:
+
+```bash
+# Using custom configuration file
+npx @lazydino/ccxt-mcp --config /path/to/ccxt-accounts.json
+```
+
+You can find an example configuration file at `examples/config-example.json` in the repository.
 
 > **Reasons to Use a Separate Configuration File**:
 >
