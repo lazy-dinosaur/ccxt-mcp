@@ -46,6 +46,18 @@ interface AccountConfig {
 }
 
 /**
+ * Redacts sensitive fields from an account config object for safe logging.
+ */
+function maskCredentials(account: Partial<AccountConfig>): string {
+  const safe = { ...account };
+  if (safe.apiKey) safe.apiKey = '***REDACTED***';
+  if (safe.secret) safe.secret = '***REDACTED***';
+  if (safe.password) safe.password = '***REDACTED***';
+  if (safe.privateKey) safe.privateKey = '***REDACTED***';
+  return JSON.stringify(safe);
+}
+
+/**
  * CCXT MCP 서버 클래스
  * MCP 프로토콜을 통해 CCXT 기능을 노출합니다.
  */
@@ -98,7 +110,21 @@ export class CcxtMcpServer {
         console.error(`[ERROR] Config file not found: ${this.configPath}`);
         return;
       }
-      
+
+      // Check file permissions — warn if world-readable
+      try {
+        const stats = fs.statSync(this.configPath);
+        const mode = stats.mode & 0o777;
+        if (mode & 0o044) {
+          console.warn(
+            `[SECURITY] Config file ${this.configPath} has permissive mode ${mode.toString(8)}. ` +
+            `Contains API keys — recommend chmod 600.`,
+          );
+        }
+      } catch {
+        // Permission check is advisory — continue even if stat fails
+      }
+
       const configContent = fs.readFileSync(this.configPath, "utf-8");
       console.error(`[DEBUG] Config file size: ${configContent.length} bytes`);
       
@@ -155,7 +181,7 @@ export class CcxtMcpServer {
           !account.secret
         ) {
           console.warn(
-            `Skipping account due to missing fields: ${JSON.stringify(account)}`,
+            `Skipping account due to missing fields: ${maskCredentials(account)}`,
           );
           continue;
         }
@@ -176,13 +202,21 @@ export class CcxtMcpServer {
         }
 
         try {
-          const exchangeOptions = {
+          const exchangeOptions: Record<string, any> = {
             apiKey: account.apiKey,
             secret: account.secret,
             options: {
-              defaultType: account.defaultType || "spot", // Use defaultType or fallback to 'spot'
+              defaultType: account.defaultType || "spot",
+              ...(account.options || {}),
             },
           };
+          if (account.password) exchangeOptions.password = account.password;
+          if (account.uid) exchangeOptions.uid = account.uid;
+          if (account.privateKey) exchangeOptions.privateKey = account.privateKey;
+          if (account.walletAddress) exchangeOptions.walletAddress = account.walletAddress;
+          if (account.enableRateLimit !== undefined) exchangeOptions.enableRateLimit = account.enableRateLimit;
+          if (account.timeout) exchangeOptions.timeout = account.timeout;
+          if (account.proxy) exchangeOptions.proxy = account.proxy;
 
           // @ts-ignore - CCXT dynamic instantiation
           const exchangeInstance = new ccxt[account.exchangeId](
@@ -215,10 +249,10 @@ export class CcxtMcpServer {
           // Store the instance using the account name as the key
           this.exchangeInstances[account.name] = exchangeInstance;
         } catch (error) {
-          // console.error(
-          //   `Failed to create CCXT instance for account '${account.name}' (${account.exchangeId}):`,
-          //   error,
-          // );
+          console.error(
+            `Failed to create CCXT instance for account '${account.name}' (${account.exchangeId}):`,
+            error instanceof Error ? error.message : 'Unknown error',
+          );
         }
       }
     } catch (error) {
