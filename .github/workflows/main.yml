@@ -24,3 +24,37 @@ jobs:
     - run: npm ci
     - run: npm run build
     - run: npm test
+
+  docker-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build Docker image
+      run: docker build -t ccxt-mcp:ci .
+    - name: Validate docker compose config
+      run: |
+        cp config/ccxt-config.example.json config/ccxt-config.json
+        docker compose config
+    - name: Run container auth smoke test
+      run: |
+        cp config/ccxt-config.example.json config/ccxt-config.json
+        sed -i 's/REPLACE_WITH_A_LONG_RANDOM_TOKEN/CI_TEST_TOKEN_123/g' config/ccxt-config.json
+
+        docker compose up -d
+
+        for i in {1..20}; do
+          if curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer CI_TEST_TOKEN_123" http://127.0.0.1:2298/healthz | grep -q "200"; then
+            break
+          fi
+          sleep 1
+        done
+
+        NO_AUTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:2298/healthz)
+        AUTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer CI_TEST_TOKEN_123" http://127.0.0.1:2298/healthz)
+
+        test "$NO_AUTH_STATUS" = "401"
+        test "$AUTH_STATUS" = "200"
+    - name: Cleanup docker compose
+      if: always()
+      run: docker compose down -v
