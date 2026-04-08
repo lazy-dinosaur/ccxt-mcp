@@ -1,0 +1,53 @@
+# Ports (CCXT on phone keypad = 2298):
+#   HTTP  -> 42298 (redirects to HTTPS)
+#   HTTPS -> 42299
+server {
+    listen 42298;
+    listen [::]:42298;
+    server_name _;
+    return 301 https://$host:42299$request_uri;
+}
+
+server {
+    listen 42299 ssl;
+    listen [::]:42299 ssl;
+    http2 on;
+    server_name _;
+
+    # Replace with your host certificate and key paths.
+    ssl_certificate /etc/ssl/certs/your-host.crt;
+    ssl_certificate_key /etc/ssl/private/your-host.key;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # Require a bearer token header.
+    # Exact token validation is enforced by the app using mcpBearerToken from config.
+    # Authorization: Bearer <token>
+    set $mcp_token "";
+    if ($http_authorization ~* "^Bearer (.+)$") {
+        set $mcp_token $1;
+    }
+
+    if ($mcp_token = "") {
+        return 401 '{"jsonrpc":"2.0","error":{"code":-32600,"message":"Authorization: Bearer <token> required"},"id":null}';
+    }
+
+    # MCP SSE endpoint through local Docker backend.
+    location / {
+        proxy_pass http://127.0.0.1:2298;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection "";
+
+        proxy_buffering off;
+        proxy_cache off;
+        chunked_transfer_encoding on;
+        proxy_read_timeout 300s;
+    }
+}

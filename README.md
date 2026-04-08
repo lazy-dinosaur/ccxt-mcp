@@ -81,6 +81,7 @@ This method includes CCXT account information directly in the Claude Desktop set
     "ccxt-mcp": {
       "command": "npx",
       "args": ["-y", "@lazydino/ccxt-mcp"],
+      "mcpBearerToken": "YOUR_MCP_TOKEN",
       "accounts": [
         {
           "name": "bybit_main",
@@ -108,10 +109,11 @@ Using this method, you don't need a separate configuration file. All settings ar
 
 To separate account information into a separate configuration file, set up as follows:
 
-1. **Create a Separate Configuration File** (e.g., `ccxt-accounts.json`):
+1. **Create a Separate Configuration File** (e.g., `ccxt-config.json`):
 
 ```json
 {
+  "mcpBearerToken": "YOUR_MCP_TOKEN",
   "accounts": [
     {
       "name": "bybit_main",
@@ -133,6 +135,8 @@ To separate account information into a separate configuration file, set up as fo
 
 > **Important**: The configuration file must contain an `accounts` array at the root level, as shown above.
 
+> **Important**: If you run the server in HTTP+SSE mode (`--sse`), set `mcpBearerToken` in the same config file. Clients must send `Authorization: Bearer <mcpBearerToken>` on requests.
+
 2. **Specify the Configuration File Path in Claude Desktop Settings**:
 
 ```json
@@ -144,7 +148,7 @@ To separate account information into a separate configuration file, set up as fo
         "-y",
         "@lazydino/ccxt-mcp",
         "--config",
-        "/path/to/ccxt-accounts.json"
+        "/path/to/ccxt-config.json"
       ]
     }
   }
@@ -157,10 +161,10 @@ To separate account information into a separate configuration file, set up as fo
 
 ```bash
 # Using custom configuration file
-npx @lazydino/ccxt-mcp --config /path/to/ccxt-accounts.json
+npx @lazydino/ccxt-mcp --config /path/to/ccxt-config.json
 ```
 
-You can find an example configuration file at `examples/config-example.json` in the repository.
+You can find an example configuration file at `config/ccxt-config.example.json` in the repository.
 
 > **Reasons to Use a Separate Configuration File**:
 >
@@ -295,6 +299,120 @@ npm install
 # Build
 npm run build
 ```
+
+## Docker
+
+### Build and Run with Docker Compose
+
+1. Create a config file:
+
+```bash
+cp config/ccxt-config.example.json config/ccxt-config.json
+```
+
+Then fill in your real API keys in `config/ccxt-config.json`.
+Also set `mcpBearerToken` in that same config file.
+2. Build image:
+
+```bash
+docker compose build
+```
+
+3. Start the MCP server in background (SSE mode on localhost:2298):
+
+```bash
+docker compose up -d
+```
+
+4. Verify local health endpoint:
+
+```bash
+curl -H "Authorization: Bearer YOUR_MCP_TOKEN" http://127.0.0.1:2298/healthz
+```
+
+This Compose setup runs MCP over HTTP+SSE (`/sse` + `/messages`) on localhost:2298 for reverse proxying.
+
+### Remote MCP Client Configuration
+
+If your MCP client runs on another host, use an Nginx reverse proxy on this machine.
+
+1. Copy `ccxt-mcp.nginx` to your Nginx config location and update certificate paths:
+
+```bash
+sudo cp ccxt-mcp.nginx /etc/nginx/conf.d/ccxt-mcp.conf
+```
+
+2. Edit `/etc/nginx/conf.d/ccxt-mcp.conf` and set:
+
+- `ssl_certificate`
+- `ssl_certificate_key`
+- Authorization header forwarding (already included in this file)
+
+3. Reload Nginx:
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+4. In your MCP client, configure the MCP server URL to your TLS endpoint:
+
+- SSE URL: `https://YOUR_HOSTNAME_OR_IP:42299/sse`
+- Messages URL: `https://YOUR_HOSTNAME_OR_IP:42299/messages`
+- Header: `Authorization: Bearer YOUR_MCP_TOKEN`
+
+You can generate a strong token with:
+
+```bash
+openssl rand -hex 32
+```
+
+Config example:
+
+```json
+{
+  "mcpBearerToken": "YOUR_MCP_TOKEN",
+  "accounts": [
+    {
+      "name": "bybit_main",
+      "exchangeId": "bybit",
+      "apiKey": "YOUR_API_KEY",
+      "secret": "YOUR_SECRET_KEY"
+    }
+  ]
+}
+```
+
+Port note:
+- `42298` is HTTP (redirect only)
+- `42299` is HTTPS
+- `2298` comes from `CCXT` on a phone keypad
+
+If your MCP client accepts command-based MCP servers instead of URL configuration, configure `ccxt-mcp` with:
+
+- Command: `docker`
+- Args:
+
+```json
+[
+  "run",
+  "--rm",
+  "-i",
+  "-p",
+  "127.0.0.1:2298:2298",
+  "-v",
+  "/absolute/path/to/ccxt-mcp/config/ccxt-config.json:/config/ccxt-config.json:ro",
+  "ccxt-mcp:local",
+  "--sse",
+  "--host",
+  "0.0.0.0",
+  "--port",
+  "2298",
+  "--config",
+  "/config/ccxt-config.json"
+]
+```
+
+Build the image first with `docker compose build`.
 
 ## 🤝 Contributing
 

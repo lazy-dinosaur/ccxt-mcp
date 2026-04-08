@@ -8,6 +8,7 @@ import {
   ResourceTemplate,
 } from "@modelcontextprotocol/sdk/server/mcp.js"; // Restore original path
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"; // Restore original path
+import { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import { URL } from "url";
 import { z } from "zod";
 import ccxt, { Exchange } from "ccxt"; // Import Exchange type
@@ -414,7 +415,14 @@ export class CcxtMcpServer {
    */
   async start() {
     const transport = new StdioServerTransport();
-    await this.server.connect(transport);
+    await this.connectTransport(transport);
     console.error("CCXT MCP Server started");
+  }
+
+  /**
+   * Connect the MCP server to any SDK transport (stdio, SSE, etc.).
+   */
+  async connectTransport(transport: Transport) {
+    await this.server.connect(transport);
   }
 }

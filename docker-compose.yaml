@@ -1,0 +1,20 @@
+services:
+  ccxt-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ccxt-mcp:local
+    ports:
+      - '127.0.0.1:2298:2298'
+    volumes:
+      - ./config/ccxt-config.json:/config/ccxt-config.json:ro
+    command:
+      [
+        "--sse",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "2298",
+        "--config",
+        "/config/ccxt-config.json"
+      ]
