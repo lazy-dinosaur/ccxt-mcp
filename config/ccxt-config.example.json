@@ -1,4 +1,5 @@
 {
+  "mcpBearerToken": "REPLACE_WITH_A_LONG_RANDOM_TOKEN",
   "accounts": [
     {
       "name": "bybit_main",

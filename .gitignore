@@ -18,6 +18,10 @@
 .env.local
 .env*.local
 
+# 로컬 CCXT 계정 설정 (민감 정보)
+/config/*.json
+!/config/*.example.json
+
 # 테스트 결과
 /junit.xml
 /test-results/

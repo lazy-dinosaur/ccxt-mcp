@@ -8,6 +8,7 @@ import {
   ResourceTemplate,
 } from "@modelcontextprotocol/sdk/server/mcp.js"; // Restore original path
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"; // Restore original path
+import { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import { URL } from "url";
 import { z } from "zod";
 import ccxt, { Exchange } from "ccxt"; // Import Exchange type
@@ -69,6 +70,8 @@ export class CcxtMcpServer {
   private publicExchangeInstances: Record<string, Exchange> = {};
   // 설정 파일 경로
   private configPath: string;
+  // 서버 초기화(계정 로드) 완료를 추적
+  private initPromise: Promise<void>;
 
   /**
    * @param configPath 사용자 지정 설정 파일 경로 (선택 사항)
@@ -91,7 +94,7 @@ export class CcxtMcpServer {
       );
 
     // 설정 파일에서 계정 로드 및 거래소 인스턴스 초기화
-    this.loadAccountsFromConfig();
+    this.initPromise = this.loadAccountsFromConfig();
 
     // 리소스 및 도구 등록
     this.registerResources();
@@ -413,8 +416,17 @@ export class CcxtMcpServer {
    * 서버를 시작합니다.
    */
   async start() {
+    await this.initPromise;
     const transport = new StdioServerTransport();
-    await this.server.connect(transport);
+    await this.connectTransport(transport);
     console.error("CCXT MCP Server started");
+  }
+
+  /**
+   * Connect the MCP server to any SDK transport (stdio, SSE, etc.).
+   */
+  async connectTransport(transport: Transport) {
+    await this.initPromise;
+    await this.server.connect(transport);
   }
 }

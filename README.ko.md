@@ -160,7 +160,7 @@ npx @lazydino/ccxt-mcp --help
 npx @lazydino/ccxt-mcp --config /path/to/ccxt-accounts.json
 ```
 
-저장소의 `examples/config-example.json`에서 예제 설정 파일을 찾을 수 있습니다.
+저장소의 `config/ccxt-config.example.json`에서 예제 설정 파일을 찾을 수 있습니다.
 
 > **별도 설정 파일을 사용하는 이유**:
 >
