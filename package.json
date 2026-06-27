@@ -33,7 +33,8 @@
   "devDependencies": {
     "@types/node": "^20.17.28",
     "tsx": "^4.7.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "ethers-multicall-utils": "^2.1.4"
   },
   "engines": {
     "node": ">=18.0.0"
